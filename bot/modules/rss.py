@@ -25,8 +25,9 @@ from bot.helper.telegram_helper.bot_commands import BotCommands
 from bot.helper.telegram_helper.filters import CustomFilters
 from bot.helper.telegram_helper.message_utils import *
 
+
+
 # New RSS Sub Import
-import pickledb
 import feedparser
 from time import sleep, time
 from pyrogram import Client, filters
@@ -34,39 +35,46 @@ from pyrogram.errors import FloodWait
 from apscheduler.schedulers.background import BackgroundScheduler
 # End New RSS Sub Import
 feed_url = "https://yts.mx/rss/0/all/all/0/all"   # RSS Feed URL of the site.
+session['RSS'] = ''
 
-# RSS DB Logic
-db = pickledb.load('rss.db', True)
-if db.get("feed_url") == None:
-  db.set("feed_url", "*")
-
-# End RSS DB Logic
 
 # Check for NEW FEED
 def check_feed():
 
     FEED = feedparser.parse(feed_url)
     # print("FEED -",FEED)
-    entry = FEED.entries[0]
-    # print("entry -", entry.links[1].href)
-    if entry.id != db.get("feed_url"):
-      add_download(self, entry.links[1].href, path , listener )
-    #   The Above Code needs to fixed add to download is not working
-      try:
-        db.set("feed_url", entry.id)
-      except FloodWait as e:
 
+    entry = FEED.entries[0]
+    print("entry - ", entry.links[1].href)
+    print("Session - "session['RSS'])
+    if entry.id != session['RSS']:
+      try:
+        # app.send_message(log_channel, message)
+        # message = f"/mirror@Rush2Drive_bot {}" this needs to send to /mirror cmd
+        session['RSS'] = entry.id
+        print("hit once")
+
+      except FloodWait as e:
         sleep(e.x)
+
       except Exception as e:
         LOGGER.log(e)
 
+
     else:
-        LOGGER.log("checked RSS")
+        print("checked RSS")
+
+
+
 
 scheduler = BackgroundScheduler()
 scheduler.add_job(check_feed, "interval", seconds=10, max_instances=10)
 scheduler.start()
 # END RSS FEED CHECK
+
+
+
+
 
 ariaDlManager = AriaDownloadHelper()
 ariaDlManager.start_listener()
