@@ -13,13 +13,13 @@ URL_REGEX = r"(?:(?:https?|ftp):\/\/)?[\w/\-?=%.]+\.[\w/\-?=%.]+"
 
 
 class MirrorStatus:
-    STATUS_UPLOADING = "Uploading"
-    STATUS_DOWNLOADING = "Downloading"
-    STATUS_WAITING = "Queued"
-    STATUS_FAILED = "Failed. Cleaning download"
-    STATUS_CANCELLED = "Cancelled"
-    STATUS_ARCHIVING = "Archiving"
-    STATUS_EXTRACTING = "Extracting"
+    STATUS_UPLOADING = "💾"
+    STATUS_DOWNLOADING = "⏬"
+    STATUS_WAITING = "🕒"
+    STATUS_FAILED = "❌"
+    STATUS_CANCELLED = "⭕️"
+    STATUS_ARCHIVING = "⚙️"
+    STATUS_EXTRACTING = "🔧"
 
 
 PROGRESS_MAX_SIZE = 100 // 8
@@ -95,14 +95,12 @@ def get_readable_message():
             msg += f"<i>{download.name()}</i> - "
             msg += download.status()
             if download.status() != MirrorStatus.STATUS_ARCHIVING and download.status() != MirrorStatus.STATUS_EXTRACTING:
-                msg += f"\n<code>{get_progress_bar_string(download)} {download.progress()}</code> of " \
-                       f"{download.size()}" \
-                       f"\n {download.speed()} \n ETA: {download.eta()} \n"
-            if download.status() == MirrorStatus.STATUS_DOWNLOADING:
-                if hasattr(download, 'is_torrent'):
-                    msg += f"| P: {download.aria_download().connections} " \
-                           f"| S: {download.aria_download().num_seeders}"
-                msg += f"\nGID: <code>{download.gid()}</code>"
+                msg += f"\n<code>{download.size()} | {get_progress_bar_string(download)} {download.progress()}</code>"
+                  if download.status() == MirrorStatus.STATUS_DOWNLOADING:
+                    if hasattr(download, 'is_torrent'):
+                        msg += f"| P: {download.aria_download().connections} " \
+                               f"| S: {download.aria_download().num_seeders}"
+                msg += f"\n ETA: {download.eta()} -@{download.speed()}  \nGID: <code>{download.gid()}</code>"
             msg += "\n\n"
         return msg
 
